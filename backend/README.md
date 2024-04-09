@@ -21,6 +21,4 @@
 
 3. Run the app:
 
-    ```properties
-    python __main__.py
-    ```
+    use `start_up.sh`
