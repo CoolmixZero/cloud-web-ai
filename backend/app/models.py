@@ -1,15 +1,33 @@
-# from database import Base
-# from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from pydantic import BaseModel, Field
+from uuid import uuid4
+from datetime import datetime
+
+def generate_id():
+    return str(uuid4())
+
+def generate_date():
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+
+    return str(dt_string)
+
+class CreateUserRequest(BaseModel):
+    username: str
+    email: str
+    password: str
 
 
-# class Users(Base):
-#     __tablename__ = 'users'
+class User(BaseModel):
+    user_id: str = Field(default_factory=generate_id)
+    username: str
+    email: str | None = None
+    disabled: bool | None = None
 
-#     id = Column(Integer, primary_key=True, index=True)
-#     email = Column(String, unique=True)
-#     username = Column(String, unique=True)
-#     first_name = Column(String)
-#     last_name = Column(String)
-#     hashed_password = Column(String)
-#     is_active = Column(Boolean, default=True)
-#     role = Column(String)
+
+class UserInDB(User):
+    hashed_password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
