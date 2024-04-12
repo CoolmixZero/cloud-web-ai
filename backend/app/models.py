@@ -16,7 +16,7 @@ class UserHistoryData(BaseModel):
     user_id: str
     username: str
     image_name: str
-    model_result: str
+    model_result: bool
     created_at: str = Field(default_factory=generate_date)
 
 class CreateUserRequest(BaseModel):
