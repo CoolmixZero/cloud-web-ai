@@ -5,11 +5,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
 from ..database import create_new_user, get_user_from_db
-from ..models import Token, CreateUserRequest, UserInDB
+from ..models import LoginUserRequest, Token, CreateUserRequest, UserInDB
 
 logging.getLogger('passlib').setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ router = APIRouter(
 )
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 def authenticate_user(username: str, password: str):
     user = get_user_from_db(username)
@@ -90,7 +90,7 @@ async def create_user(create_user_request: CreateUserRequest) -> dict:
 
 @router.post("/login", description="Login endpoint")
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    form_data: LoginUserRequest,
 ) -> dict:
     user = authenticate_user(form_data.username, form_data.password)
     if not user:

@@ -25,6 +25,19 @@ class CreateUserRequest(BaseModel):
                 "password": "weakpassword"
             }
         }
+        
+
+class LoginUserRequest(BaseModel):
+    username: str
+    password: str
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "kekic",
+                "password": "weakpassword"
+            }
+        }
 
 
 class User(BaseModel):
