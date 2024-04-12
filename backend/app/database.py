@@ -59,7 +59,7 @@ def insert_to_user_history(data: dict):
 	status_code = response['ResponseMetadata']['HTTPStatusCode']
  
 	return status_code
-
+	
 def get_user_history(user_id: str):
     response = history_table.scan(
 		FilterExpression=Key('user_id').eq(user_id)
