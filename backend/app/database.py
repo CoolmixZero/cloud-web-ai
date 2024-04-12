@@ -4,11 +4,14 @@ from boto3.dynamodb.conditions import Attr, Key
 
 from .models import UserInDB
 
-user_table = resource("dynamodb",
+
+dynamodb = resource("dynamodb",
 				aws_access_key_id=getenv("AWS_ACCES_KEY_ID"),
 				aws_secret_access_key=getenv("AWS_SECRET_ACCES_KEY"),
 				region_name=getenv("REGION_NAME")
-).Table("users_table")
+)
+user_table = dynamodb.Table("users_table")
+history_table = dynamodb.Table("history_table")
 
 def init_test_user():
 	response = user_table.put_item(
@@ -49,3 +52,20 @@ def get_user_from_db(username: str) -> UserInDB | None:
 
     items = response.get("Items")
     return UserInDB(**items[0])
+  
+
+def insert_to_user_history(data: dict):
+	response = history_table.put_item(Item=data)
+	status_code = response['ResponseMetadata']['HTTPStatusCode']
+ 
+	return status_code
+
+def get_user_history(user_id: str):
+    response = history_table.scan(
+		FilterExpression=Key('user_id').eq(user_id)
+	)
+    if response.get("Count") == 0:
+        return None
+    
+    items = response.get("Items")
+    return items
