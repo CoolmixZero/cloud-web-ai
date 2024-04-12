@@ -29,17 +29,11 @@ async def create_upload_file(file: UploadFile, current_user: dict = Depends(get_
     data = json.dumps({"image": im_b64})
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     
-    # TODO: add url to model endpoint
-    url = ""
-    # res = httpx.post(url, data=data, headers=headers)
+    url = "https://boocancer-nn.azurewebsites.net/test"
+    res = httpx.post(url, data=data, headers=headers)
     
-    # TODO: get result from response
-    result = "yes"
-    # data = response.json()
-    # print(response.text)
-    
-    print(current_user)
-    
+    result = bool(res.json().get("prediction")[0][0])
+        
     user_history_obj = {
       "user_id": current_user.get("user_id"),
       "username": current_user.get("username"),
