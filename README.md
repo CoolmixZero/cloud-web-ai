@@ -29,9 +29,8 @@ Backend (FastAPI) --> AWS Lambda --> AWS DynamoDB
 - Configure environment variables for AWS credentials and other settings.
 - Deploy backend on AWS Lambda.
 - Start-up:
-
-Access the deployed backend URL.
-Use the provided endpoints for login, registration, image upload, and history retrieval.
+  - Access the deployed backend URL.
+  - Use the provided endpoints for login, registration, image upload, and history retrieval.
 
 2. Inputs:
 - User credentials for login and registration.
