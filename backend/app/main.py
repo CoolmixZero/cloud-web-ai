@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from typing import Annotated
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from dotenv import load_dotenv
-from .routes import auth
+from .routes import auth, upload
 
 load_dotenv()
 
@@ -29,6 +30,7 @@ def hello():
     return {"message": "Hello world"}
 
 app.include_router(auth.router)
+app.include_router(upload.router)
 
 handler = Mangum(app)
 
