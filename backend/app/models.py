@@ -12,6 +12,13 @@ def generate_date():
 
     return str(dt_string)
 
+class UserHistoryData(BaseModel):
+    user_id: str
+    username: str
+    image_name: str
+    model_result: str
+    created_at: str = Field(default_factory=generate_date)
+
 class CreateUserRequest(BaseModel):
     username: str
     email: str
