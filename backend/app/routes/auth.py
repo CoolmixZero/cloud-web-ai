@@ -1,31 +1,27 @@
+from os import getenv
 from datetime import timedelta, datetime, timezone
 import logging
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from starlette import status
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
-import uuid
 
-from database import create_new_user, get_user_from_db
-from models import Token, CreateUserRequest, User, UserInDB
+from ..database import create_new_user, get_user_from_db
+from ..models import Token, CreateUserRequest, UserInDB
 
 logging.getLogger('passlib').setLevel(logging.ERROR)
+logger = logging.getLogger(__name__)
+
 
 router = APIRouter(
     prefix='/auth',
     tags=['auth']
 )
 
-SECRET_KEY = '197b2c37c391bed93fe80344fe73b806947a65e36206e05a1a23c2fa12702fe3'
-ALGORITHM = 'HS256'
-
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
-
-
 
 def authenticate_user(username: str, password: str):
     user = get_user_from_db(username)
@@ -35,32 +31,32 @@ def authenticate_user(username: str, password: str):
         return False
     return user
 
-
 def create_access_token(username: str, user_id: str, expires_delta: timedelta):
     encode = {'sub': username, 'user_id': user_id}
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({'exp': expires})
-    return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
-
+    return jwt.encode(encode, getenv("JWT_SECRET_KEY"), algorithm=getenv("ALGORITHM"))
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, getenv("JWT_SECRET_KEY"), algorithm=getenv("ALGORITHM"))
         username: str = payload.get('sub')
         user_id: str = payload.get('user_id')
         if username is None or id is None:
+            logger.error('Invalid token. Username or user_id is None.')
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail='Could not validate user.')
         return {'username': username, 'user_id': user_id}
     except JWTError:
+        logger.error('JWT Error. Failed to decode token.')
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Could not validate user.')
 
-
-@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED, description="Sign-up endpoint")
-async def create_user(create_user_request: CreateUserRequest) -> Token:
+@router.post("/register", status_code=status.HTTP_201_CREATED, description="Sign-up endpoint")
+async def create_user(create_user_request: CreateUserRequest) -> dict:
     user_in_db = get_user_from_db(create_user_request.username) is not None
     if user_in_db:
+        logger.warning(f"User '{create_user_request.username}' already registered.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Username already registered")
     
@@ -77,23 +73,37 @@ async def create_user(create_user_request: CreateUserRequest) -> Token:
     status_code = create_new_user(new_user.dict())
     
     if status_code not in [200, 201]:
-        raise("Error when creating user in DynamoDB")
+        logger.error("Error when creating user in DynamoDB")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Error when creating user in DynamoDB")
     
     access_token_expires = timedelta(minutes=20)
     access_token = create_access_token(new_user.username, new_user.user_id, access_token_expires)
     
-    return Token(access_token=access_token, token_type="bearer")
+    response = {
+        "status": 201,
+        "result": Token(access_token=access_token, token_type="bearer").dict()
+    }
+    
+    logger.info(f"User '{create_user_request.username}' registered successfully.")
+    return response
 
-
-@router.post("/login", response_model=Token, description="Login endpoint")
+@router.post("/login", description="Login endpoint")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
-) -> Token:
-    
+) -> dict:
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
+        logger.warning(f"Failed login attempt for user '{form_data.username}'. Incorrect username or password.")
         raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
     access_token_expires = timedelta(minutes=20)
     access_token = create_access_token(user.username, user.user_id, access_token_expires)
 
-    return Token(access_token=access_token, token_type="bearer")
+    response = {
+        "status": 200,
+        "result": Token(access_token=access_token, token_type="bearer").dict()
+    }
+    
+    logger.info(f"User '{user.username}' logged in successfully.")
+    return response
