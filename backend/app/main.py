@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import init_test_user, get_user_from_db
-from routes import auth
+from mangum import Mangum
+from dotenv import load_dotenv
+from .routes import auth
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -9,7 +12,8 @@ origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",
     "http://localhost",
-    "http://localhost:8080",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 app.add_middleware(
@@ -20,7 +24,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def hello():
+    return {"message": "Hello world"}
+
 app.include_router(auth.router)
+
+handler = Mangum(app)
 
 # init_test_user()
 # print(get_user_from_db("coolmix"))
