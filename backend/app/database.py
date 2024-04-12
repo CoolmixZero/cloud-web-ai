@@ -1,10 +1,14 @@
-import uuid
+from os import getenv
 from boto3 import resource
 from boto3.dynamodb.conditions import Attr, Key
 
-from models import UserInDB
+from .models import UserInDB
 
-user_table = resource("dynamodb").Table("users_table")
+user_table = resource("dynamodb",
+				aws_access_key_id=getenv("AWS_ACCES_KEY_ID"),
+				aws_secret_access_key=getenv("AWS_SECRET_ACCES_KEY"),
+				region_name=getenv("REGION_NAME")
+).Table("users_table")
 
 def init_test_user():
 	response = user_table.put_item(
