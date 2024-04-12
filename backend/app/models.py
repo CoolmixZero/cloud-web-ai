@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from uuid import uuid4
 from datetime import datetime
+
 
 def generate_id():
     return str(uuid4())
@@ -15,12 +16,21 @@ class CreateUserRequest(BaseModel):
     username: str
     email: str
     password: str
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "kekic",
+                "email": "whoisdis@x.com",
+                "password": "weakpassword"
+            }
+        }
 
 
 class User(BaseModel):
     user_id: str = Field(default_factory=generate_id)
     username: str
-    email: str | None = None
+    email: EmailStr | None = None
     disabled: bool | None = None
 
 
