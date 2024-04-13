@@ -1,6 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
+import HomeViewVue from '@/views/HomeView.vue'
+import LoginViewVue from '@/views/LoginView.vue'
+import RegisterViewVue from '@/views/RegisterView.vue'
+import ProfileViewVue from '@/views/ProfileView.vue'
+
 const authGuard = (to, from, next) => {
   const userStore = useUserStore()
   if (userStore.token) return next({ name: 'home' })
@@ -13,23 +18,23 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: import('@/views/HomeView.vue')
+      component: HomeViewVue
     },
     {
       path: '/login',
       name: 'Login',
-      component: import('@/views/LoginView.vue'),
+      component: LoginViewVue,
       beforeEnter: authGuard
     },
     {
       path: '/register',
       name: 'Register',
-      component: import('@/views/RegisterView.vue')
+      component: RegisterViewVue
     },
     {
       path: '/profile',
       name: 'Profile',
-      component: import('@/views/ProfileView.vue')
+      component: ProfileViewVue
     }
   ]
 })
