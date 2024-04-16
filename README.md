@@ -2,7 +2,7 @@
 
 ## Diagram 
 
-![image](https://github.com/CoolmixZero/cloud-web-ai/assets/107999456/43f59a3f-7eeb-441f-a238-b40f41231186)
+![image](https://github.com/CoolmixZero/cloud-web-ai/assets/107999456/f2dd48d7-5052-485e-b2f9-08d70a579660)
 
 ## Backend (Nikita)
 
