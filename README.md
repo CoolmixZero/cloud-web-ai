@@ -1,5 +1,9 @@
 # cloud-web-ai
 
+## Diagram 
+
+![image](https://github.com/CoolmixZero/cloud-web-ai/assets/107999456/43f59a3f-7eeb-441f-a238-b40f41231186)
+
 ## Backend (Nikita)
 
 #### Verbal Analysis and Task Analysis:
