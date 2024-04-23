@@ -1,5 +1,7 @@
 # cloud-web-ai
 
+![ViteApp-GoogleChrome2024-04-2316-29-55-ezgif com-crop](https://github.com/CoolmixZero/cloud-web-ai/assets/107999456/8d4323c5-adae-4884-b361-4a6f4ef9e6b9)
+
 ## Diagram 
 
 ![image](https://github.com/CoolmixZero/cloud-web-ai/assets/107999456/f2dd48d7-5052-485e-b2f9-08d70a579660)
